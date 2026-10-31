@@ -121,35 +121,35 @@ class GridSyncApp {
     `;
 
     // KPI Cards
-    const pfColor = t.statusLevel === 'optimal' ? '#10b981' : (t.statusLevel === 'penalty' ? '#f43f5e' : '#f59e0b');
+    const pfColor = t.statusLevel === 'optimal' ? '#0d9488' : (t.statusLevel === 'penalty' ? '#e11d48' : '#d97706');
     this.kpiPf.style.color = pfColor;
     this.kpiPf.textContent = t.powerFactor.toFixed(3);
     this.kpiPfSub.textContent = `Angle φ = ${t.phaseAngleDeg}° (${t.isLeading ? 'Leading' : 'Lagging'})`;
 
-    this.kpiCurrent.style.color = '#38bdf8';
+    this.kpiCurrent.style.color = '#4f46e5';
     this.kpiCurrent.textContent = `${t.lineCurrentAmp} A`;
     this.kpiCurrentSub.textContent = t.currentReductionPct > 0
       ? `↓ ${t.currentReductionPct}% vs Uncomp (${t.uncompensatedCurrentAmp} A)`
       : `Uncompensated: ${t.uncompensatedCurrentAmp} A`;
 
-    this.kpiPower.style.color = '#f8fafc';
+    this.kpiPower.style.color = '#0f172a';
     this.kpiPower.textContent = `${t.loadKw} kW`;
     this.kpiPowerSub.textContent = `Grid: ${t.gridImportKw} kW | Solar: ${t.solarKw} kW`;
 
-    this.kpiReactive.style.color = '#a855f7';
+    this.kpiReactive.style.color = '#4f46e5';
     this.kpiReactive.textContent = `${t.QNetKvar} kVAR`;
     this.kpiReactiveSub.textContent = `Load: ${t.loadKvar} | Cap: -${t.capKvar} kVAR`;
 
-    this.kpiLoss.style.color = t.lineLossKw < t.uncompLossKw ? '#10b981' : '#f59e0b';
+    this.kpiLoss.style.color = t.lineLossKw < t.uncompLossKw ? '#0d9488' : '#d97706';
     this.kpiLoss.textContent = `${t.lineLossKw} kW`;
     this.kpiLossSub.textContent = `Apparent S = ${t.apparentKva} kVA`;
 
     this.solarValTxt.textContent = `${this.engine.solarIrradiancePct}% (${t.solarKw} kW)`;
 
-    this.btnAutoApfc.className = `sw-btn sw-auto-full ${this.engine.autoApfcEnabled ? 'btn-emerald' : ''}`;
+    this.btnAutoApfc.className = `btn-primary-full ${this.engine.autoApfcEnabled ? 'btn-emerald' : ''}`;
     this.btnAutoApfc.textContent = this.engine.autoApfcEnabled
-      ? '🤖 AUTO-APFC RELAY: ENGAGED (TARGET cos φ ≥ 0.98)'
-      : '🤖 ENABLE AUTO-APFC CLOSED-LOOP RELAY';
+      ? 'Auto-APFC Relay: Active (cos φ ≥ 0.98)'
+      : 'Enable Auto-APFC Closed-Loop Relay';
 
     this.renderLoadBreakers();
     this.renderCapButtons();
@@ -158,41 +158,41 @@ class GridSyncApp {
 
   renderSingleLineDiagram() {
     const t = this.engine.telemetry;
-    const capCol = t.capKvar > 0 ? '#00f5d4' : '#475569';
-    const pvCol = t.solarKw > 0 ? '#ffb703' : '#475569';
-    const loadCol = t.loadKw > 0 ? '#38bdf8' : '#475569';
+    const capCol = t.capKvar > 0 ? '#4f46e5' : '#94a3b8';
+    const pvCol = t.solarKw > 0 ? '#d97706' : '#94a3b8';
+    const loadCol = t.loadKw > 0 ? '#0f172a' : '#94a3b8';
 
-    this.sldSvg.setAttribute('viewBox', '0 0 1120 132');
+    this.sldSvg.setAttribute('viewBox', '0 0 920 125');
     this.sldSvg.innerHTML = `
       <!-- Main 400V 3-Phase Industrial Busbar -->
-      <line x1="60" y1="66" x2="1060" y2="66" stroke="#ffb703" stroke-width="5" stroke-linecap="square" />
-      <text x="560" y="56" text-anchor="middle" fill="#ffb703" font-family="Share Tech Mono, monospace" font-size="11" font-weight="700">
-        ═══ 400V AC 3-PHASE MAIN SUBSTATION BUSBAR (V_LL = ${t.busVoltageLL} V | I_FEEDER = ${t.lineCurrentAmp} A | cos φ = ${t.powerFactor.toFixed(3)}) ═══
+      <line x1="50" y1="62" x2="870" y2="62" stroke="#0f172a" stroke-width="4" stroke-linecap="round" />
+      <text x="460" y="53" text-anchor="middle" fill="#0f172a" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">
+        400V 3-PHASE DISTRIBUTION BUSBAR (${t.busVoltageLL} V_LL · I = ${t.lineCurrentAmp} A · cos φ = ${t.powerFactor.toFixed(3)})
       </text>
 
       <!-- Utility Grid Feeder (Top Left) -->
-      <rect x="65" y="6" width="225" height="38" rx="0" fill="#06152d" stroke="#00f5d4" stroke-width="1.8" />
-      <text x="177" y="21" text-anchor="middle" fill="#00f5d4" font-family="Share Tech Mono, monospace" font-size="10" font-weight="700">[CB-01] UTILITY PCC (20kV/400V)</text>
-      <text x="177" y="36" text-anchor="middle" fill="#e2f1ff" font-family="Share Tech Mono, monospace" font-size="9.5">IMPORT: ${t.gridImportKw} kW | Q_NET: ${t.QNetKvar} kVAR</text>
-      <line x1="177" y1="44" x2="177" y2="66" stroke="#00f5d4" stroke-width="2.5" />
+      <rect x="55" y="4" width="205" height="36" rx="6" fill="#f0fdf4" stroke="#0d9488" stroke-width="1.5" />
+      <text x="157" y="19" text-anchor="middle" fill="#0f766e" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Utility PCC Feeder (20kV/400V)</text>
+      <text x="157" y="33" text-anchor="middle" fill="#334155" font-family="JetBrains Mono, monospace" font-size="9">Import: ${t.gridImportKw} kW | Q: ${t.QNetKvar} kVAR</text>
+      <line x1="157" y1="40" x2="157" y2="62" stroke="#0d9488" stroke-width="2" />
 
       <!-- Solar PV Inverter (Top Right) -->
-      <rect x="820" y="6" width="225" height="38" rx="0" fill="#06152d" stroke="${pvCol}" stroke-width="1.8" />
-      <text x="932" y="21" text-anchor="middle" fill="${pvCol}" font-family="Share Tech Mono, monospace" font-size="10" font-weight="700">[INV-PV] SOLAR TIE-IN (100kWp)</text>
-      <text x="932" y="36" text-anchor="middle" fill="#e2f1ff" font-family="Share Tech Mono, monospace" font-size="9.5">INJECTION: ${t.solarKw} kW (UNITY PF)</text>
-      <line x1="932" y1="44" x2="932" y2="66" stroke="${pvCol}" stroke-width="2.5" />
+      <rect x="655" y="4" width="205" height="36" rx="6" fill="#fffbeb" stroke="${pvCol}" stroke-width="1.5" />
+      <text x="757" y="19" text-anchor="middle" fill="#b45309" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Solar PV Inverter (100 kWp)</text>
+      <text x="757" y="33" text-anchor="middle" fill="#334155" font-family="JetBrains Mono, monospace" font-size="9">Output: ${t.solarKw} kW (Unity PF)</text>
+      <line x1="757" y1="40" x2="757" y2="62" stroke="${pvCol}" stroke-width="2" />
 
       <!-- Industrial Inductive Motor Loads (Bottom Left) -->
-      <line x1="330" y1="66" x2="330" y2="88" stroke="${loadCol}" stroke-width="2.5" />
-      <rect x="200" y="88" width="260" height="38" rx="0" fill="#06152d" stroke="${loadCol}" stroke-width="1.8" />
-      <text x="330" y="103" text-anchor="middle" fill="${loadCol}" font-family="Share Tech Mono, monospace" font-size="10" font-weight="700">[MCC-1..5] INDUCTIVE PLANT FEEDERS</text>
-      <text x="330" y="118" text-anchor="middle" fill="#e2f1ff" font-family="Share Tech Mono, monospace" font-size="9.5">P_LOAD = ${t.loadKw} kW | Q_L = +${t.loadKvar} kVAR</text>
+      <line x1="270" y1="62" x2="270" y2="84" stroke="${loadCol}" stroke-width="2" />
+      <rect x="155" y="84" width="230" height="36" rx="6" fill="#f8fafc" stroke="${loadCol}" stroke-width="1.5" />
+      <text x="270" y="99" text-anchor="middle" fill="#0f172a" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">Inductive Plant Loads (MCC)</text>
+      <text x="270" y="113" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">P = ${t.loadKw} kW | Q_L = +${t.loadKvar} kVAR</text>
 
       <!-- 6-Stage Detuned Capacitor Bank (Bottom Right) -->
-      <line x1="770" y1="66" x2="770" y2="88" stroke="${capCol}" stroke-width="2.5" />
-      <rect x="640" y="88" width="260" height="38" rx="0" fill="#06152d" stroke="${capCol}" stroke-width="1.8" />
-      <text x="770" y="103" text-anchor="middle" fill="${capCol}" font-family="Share Tech Mono, monospace" font-size="10" font-weight="700">[APFC C1..C6] DETUNED CAP BANK (${this.engine.activeCapStages}/6)</text>
-      <text x="770" y="118" text-anchor="middle" fill="#e2f1ff" font-family="Share Tech Mono, monospace" font-size="9.5">COMPENSATION: Q_C = -${t.capKvar} kVAR</text>
+      <line x1="640" y1="62" x2="640" y2="84" stroke="${capCol}" stroke-width="2" />
+      <rect x="520" y="84" width="240" height="36" rx="6" fill="#eef2ff" stroke="${capCol}" stroke-width="1.5" />
+      <text x="640" y="99" text-anchor="middle" fill="#4f46e5" font-family="Inter, sans-serif" font-size="9.5" font-weight="700">APFC Capacitor Bank (${this.engine.activeCapStages}/6)</text>
+      <text x="640" y="113" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">Compensation: Q_C = -${t.capKvar} kVAR</text>
     `;
   }
 
@@ -209,23 +209,31 @@ class GridSyncApp {
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    // Grid lines
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
+    // Subtle light grid lines
+    ctx.strokeStyle = '#f1f5f9';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(0, h / 2);
-    ctx.lineTo(w, h / 2);
-    for (let x = 0; x < w; x += 60) {
+    for (let x = 0; x < w; x += 50) {
       ctx.moveTo(x, 0);
       ctx.lineTo(x, h);
     }
+    for (let y = 0; y < h; y += 45) {
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+    }
+    ctx.stroke();
+
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.beginPath();
+    ctx.moveTo(0, h / 2);
+    ctx.lineTo(w, h / 2);
     ctx.stroke();
 
     const t = this.engine.telemetry;
-    const phiRad = (t.phaseAngleDeg * Math.PI) / 180; // Positive = lagging
+    const phiRad = (t.phaseAngleDeg * Math.PI) / 180;
 
-    // 1. Reference Voltage Wave v(t) = Vm sin(wt)
-    ctx.strokeStyle = '#38bdf8';
+    // 1. Reference Voltage Wave v(t)
+    ctx.strokeStyle = '#4f46e5';
     ctx.lineWidth = 2.4;
     ctx.beginPath();
     for (let x = 0; x < w; x++) {
@@ -236,8 +244,8 @@ class GridSyncApp {
     }
     ctx.stroke();
 
-    // 2. Line Current Wave i(t) = Im sin(wt - phi)
-    const iCol = t.statusLevel === 'optimal' ? '#10b981' : (t.statusLevel === 'penalty' ? '#f43f5e' : '#f59e0b');
+    // 2. Line Current Wave i(t)
+    const iCol = t.statusLevel === 'optimal' ? '#0d9488' : (t.statusLevel === 'penalty' ? '#e11d48' : '#d97706');
     const iAmpScale = Math.min(0.42, Math.max(0.14, (t.lineCurrentAmp / 420) * 0.38));
     ctx.strokeStyle = iCol;
     ctx.lineWidth = 2.4;
@@ -250,12 +258,11 @@ class GridSyncApp {
     }
     ctx.stroke();
 
-    // Legend overlay
-    ctx.font = '600 11px JetBrains Mono, monospace';
-    ctx.fillStyle = '#38bdf8';
+    ctx.font = '600 11px Inter, sans-serif';
+    ctx.fillStyle = '#4f46e5';
     ctx.fillText('─── v(t) Bus Voltage (400V)', 14, 22);
     ctx.fillStyle = iCol;
-    ctx.fillText(`─── i(t) Line Current (${t.lineCurrentAmp}A, φ = ${t.phaseAngleDeg}°)`, 14, 40);
+    ctx.fillText(`─── i(t) Line Current (${t.lineCurrentAmp}A, φ = ${t.phaseAngleDeg}°)`, 14, 38);
   }
 
   drawPowerTriangle() {
@@ -273,10 +280,10 @@ class GridSyncApp {
 
     const t = this.engine.telemetry;
     const maxScale = Math.max(180, t.loadKw, t.loadKvar, t.apparentKva) * 1.25;
-    const ox = 52;
-    const oy = h - 42;
-    const scaleX = (w - 105) / maxScale;
-    const scaleY = (h - 75) / maxScale;
+    const ox = 48;
+    const oy = h - 36;
+    const scaleX = (w - 96) / maxScale;
+    const scaleY = (h - 68) / maxScale;
     const scale = Math.min(scaleX, scaleY);
 
     const px = ox + t.loadKw * scale;
@@ -284,7 +291,7 @@ class GridSyncApp {
     const qNetY = oy - t.QNetKvar * scale;
 
     // 1. Uncompensated dashed triangle
-    ctx.strokeStyle = 'rgba(244, 63, 94, 0.35)';
+    ctx.strokeStyle = 'rgba(225, 29, 72, 0.35)';
     ctx.setLineDash([4, 4]);
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -294,26 +301,26 @@ class GridSyncApp {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // 2. Active Power P (Horizontal Emerald/Cyan)
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 3;
+    // 2. Active Power P (Horizontal Slate)
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2.8;
     ctx.beginPath();
     ctx.moveTo(ox, oy);
     ctx.lineTo(px, oy);
     ctx.stroke();
 
-    // 3. Net Reactive Power Q_net (Vertical)
-    ctx.strokeStyle = '#a855f7';
-    ctx.lineWidth = 3;
+    // 3. Net Reactive Power Q_net (Vertical Indigo)
+    ctx.strokeStyle = '#4f46e5';
+    ctx.lineWidth = 2.8;
     ctx.beginPath();
     ctx.moveTo(px, oy);
     ctx.lineTo(px, qNetY);
     ctx.stroke();
 
-    // 4. Resultant Apparent Power S (Hypotenuse)
-    const sCol = t.statusLevel === 'optimal' ? '#10b981' : '#f43f5e';
+    // 4. Resultant Apparent Power S (Hypotenuse Teal)
+    const sCol = t.statusLevel === 'optimal' ? '#0d9488' : '#e11d48';
     ctx.strokeStyle = sCol;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 2.8;
     ctx.beginPath();
     ctx.moveTo(ox, oy);
     ctx.lineTo(px, qNetY);
@@ -321,10 +328,10 @@ class GridSyncApp {
 
     // Labels
     ctx.font = '700 11px JetBrains Mono, monospace';
-    ctx.fillStyle = '#38bdf8';
+    ctx.fillStyle = '#0f172a';
     ctx.fillText(`P = ${t.loadKw} kW`, ox + (px - ox) * 0.32, oy + 18);
 
-    ctx.fillStyle = '#a855f7';
+    ctx.fillStyle = '#4f46e5';
     ctx.fillText(`Q_net = ${t.QNetKvar} kVAR`, Math.min(w - 135, px + 8), (oy + qNetY) / 2);
 
     ctx.fillStyle = sCol;

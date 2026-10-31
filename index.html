@@ -3,188 +3,150 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GridSync // 400V Substation Mimic & APFC Switchgear</title>
+  <title>GridSync — 3-Phase Microgrid &amp; Power Factor Correction</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=20261101_02" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=20261101_03" />
 </head>
 <body>
 
-  <!-- SUBSTATION MIMIC TOP HEADER -->
-  <header class="substation-header">
-    <div class="sub-brand">
-      <div class="sub-emblem">
-        <span class="sub-kv">400V</span>
-        <span class="sub-hz">50Hz</span>
-      </div>
-      <div>
-        <div class="sub-super">IEC 61850 SUBSTATION AUTOMATION // BAY-04 PCC</div>
-        <h1>GRIDSYNC — 3-PHASE MICROGRID &amp; APFC SWITCHGEAR MIMIC</h1>
-      </div>
-    </div>
+  <div class="app-shell">
 
-    <div id="verdict-banner" class="verdict-banner penalty">
-      <span>⚡ GRID DIAGNOSTIC: PENALTY ALERT</span>
-      <span>Bus Voltage: 382.4 V_LL</span>
-    </div>
-
-    <div class="sub-presets">
-      <span class="preset-lbl">LOAD PROFILES:</span>
-      <button id="btn-scen-lag" class="sw-btn sw-danger">01 // HEAVY LAGGING (PF 0.66)</button>
-      <button id="btn-scen-opt" class="sw-btn sw-optimal">02 // AUTO-APFC LOCKED (PF 0.99)</button>
-      <button id="btn-scen-lead" class="sw-btn sw-warn">03 // OVER-COMPENSATED LEADING</button>
-    </div>
-  </header>
-
-  <!-- WORKSPACE: TOP FULL-WIDTH MIMIC BUSBAR + BOTTOM 3-BAY SWITCHGEAR RACK -->
-  <main class="substation-deck">
-
-    <!-- FULL-WIDTH HERO: INTERACTIVE SINGLE-LINE MIMIC DIAGRAM -->
-    <section class="mimic-board">
-      <div class="mimic-titlebar">
-        <span>[MIMIC-SLD-01] 20kV/400V MAIN SUBSTATION BUSBAR TOPOLOGY &amp; REACTIVE POWER FLOW</span>
-        <span class="mimic-coords">GRID REF: X-400 // PCC FEEDER BAY</span>
-      </div>
-      <div class="mimic-canvas-wrap">
-        <svg id="sld-svg"></svg>
-      </div>
-    </section>
-
-    <!-- 3-COLUMN SUBSTATION INSTRUMENTATION & SWITCHGEAR RACK -->
-    <div class="switchgear-bays">
-
-      <!-- BAY 01: DIGITAL PANEL METERS (7-SEGMENT STYLE VERTICAL RACK) -->
-      <aside class="bay-panel">
-        <div class="bay-head">
-          <span>[BAY-01] DIGITAL MULTIMETER RACK</span>
-          <span>CLASS 0.2S</span>
+    <!-- LEFT FULL-HEIGHT CONTROL SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark">cosφ</div>
+        <div>
+          <h1>GridSync EMS</h1>
+          <p>400V 3-Phase · 50 Hz APFC</p>
         </div>
-        <div class="dpm-rack">
-          <div class="dpm-unit">
-            <div class="dpm-meta">
-              <span class="dpm-tag">METER M1 // POWER FACTOR</span>
-              <span class="dpm-unit-lbl">cos φ</span>
-            </div>
-            <div id="kpi-pf" class="dpm-readout">0.659</div>
-            <div id="kpi-pf-sub" class="dpm-sub">Angle φ = 48.8° (Lagging)</div>
-          </div>
+      </div>
 
-          <div class="dpm-unit">
-            <div class="dpm-meta">
-              <span class="dpm-tag">METER M2 // RMS FEEDER CURRENT</span>
-              <span class="dpm-unit-lbl">AMPS</span>
-            </div>
-            <div id="kpi-current" class="dpm-readout">405.5 A</div>
-            <div id="kpi-current-sub" class="dpm-sub">Uncompensated: 405.5 A</div>
-          </div>
+      <!-- Scenario Presets -->
+      <div class="sidebar-section">
+        <div class="sec-label">Simulation Scenarios</div>
+        <div class="preset-group">
+          <button id="btn-scen-lag" class="btn-pill">Lagging Penalty (0.66)</button>
+          <button id="btn-scen-opt" class="btn-pill active">Optimal APFC (0.99)</button>
+          <button id="btn-scen-lead" class="btn-pill">Over-Compensated</button>
+        </div>
+      </div>
 
-          <div class="dpm-unit">
-            <div class="dpm-meta">
-              <span class="dpm-tag">METER M3 // ACTIVE DEMAND</span>
-              <span class="dpm-unit-lbl">kW</span>
-            </div>
-            <div id="kpi-power" class="dpm-readout">185.0 kW</div>
-            <div id="kpi-power-sub" class="dpm-sub">Grid + Solar PV</div>
-          </div>
+      <!-- 6-Stage Capacitor Bank -->
+      <div class="sidebar-section">
+        <div class="sec-head">
+          <span class="sec-label">APFC Capacitor Bank</span>
+          <span class="sec-meta">6 × 30 kVAR</span>
+        </div>
+        <button id="btn-auto-apfc" class="btn-primary-full">
+          Auto-APFC Relay: Active
+        </button>
+        <div id="cap-grid" class="cap-grid"></div>
+      </div>
 
-          <div class="dpm-unit">
-            <div class="dpm-meta">
-              <span class="dpm-tag">METER M4 // NET REACTIVE BUS</span>
-              <span class="dpm-unit-lbl">kVAR</span>
-            </div>
-            <div id="kpi-reactive" class="dpm-readout">211.3 kVAR</div>
-            <div id="kpi-reactive-sub" class="dpm-sub">Load - Cap Bank</div>
-          </div>
+      <!-- Solar PV Inverter -->
+      <div class="sidebar-section">
+        <div class="sec-head">
+          <span class="sec-label">Solar PV Tie-In</span>
+          <span id="solar-val-txt" class="sec-mono">35% (35 kW)</span>
+        </div>
+        <input id="solar-slider" type="range" min="0" max="100" value="35" class="clean-slider" />
+        <div class="slider-captions">
+          <span>0 kW</span>
+          <span>50 kW</span>
+          <span>100 kWp</span>
+        </div>
+      </div>
 
-          <div class="dpm-unit">
-            <div class="dpm-meta">
-              <span class="dpm-tag">METER M5 // COPPER I²R LOSS</span>
-              <span class="dpm-unit-lbl">LOSS kW</span>
-            </div>
-            <div id="kpi-loss" class="dpm-readout">22.20 kW</div>
-            <div id="kpi-loss-sub" class="dpm-sub">Apparent S = 280.9 kVA</div>
+      <!-- Plant Load Breakers -->
+      <div class="sidebar-section" style="border-bottom:none; flex:1;">
+        <div class="sec-head">
+          <span class="sec-label">Plant Feeder Breakers</span>
+          <span class="sec-meta">Click to Toggle</span>
+        </div>
+        <div id="load-list" class="load-list"></div>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN WORKSPACE -->
+    <main class="workspace">
+
+      <!-- Top Diagnostic & Unified KPI Ribbon -->
+      <header class="workspace-top">
+        <div id="verdict-banner" class="verdict-banner optimal">
+          <span>System Optimal — Reactive Power Compensated</span>
+          <span>Bus Voltage: 386.0 V_LL (50 Hz)</span>
+        </div>
+
+        <div class="kpi-ribbon">
+          <div class="kpi-cell">
+            <span class="kpi-label">Power Factor (cos φ)</span>
+            <strong id="kpi-pf" class="kpi-val">0.963</strong>
+            <small id="kpi-pf-sub" class="kpi-sub">Angle φ = 15.6°</small>
+          </div>
+          <div class="kpi-cell">
+            <span class="kpi-label">RMS Line Current</span>
+            <strong id="kpi-current" class="kpi-val">224.7 A</strong>
+            <small id="kpi-current-sub" class="kpi-sub">3-Phase Feeder</small>
+          </div>
+          <div class="kpi-cell">
+            <span class="kpi-label">Active Demand (P)</span>
+            <strong id="kpi-power" class="kpi-val">150.0 kW</strong>
+            <small id="kpi-power-sub" class="kpi-sub">Grid + Solar PV</small>
+          </div>
+          <div class="kpi-cell">
+            <span class="kpi-label">Net Reactive (Q)</span>
+            <strong id="kpi-reactive" class="kpi-val">41.9 kVAR</strong>
+            <small id="kpi-reactive-sub" class="kpi-sub">Load - Cap Bank</small>
+          </div>
+          <div class="kpi-cell">
+            <span class="kpi-label">Feeder I²R Loss</span>
+            <strong id="kpi-loss" class="kpi-val">6.82 kW</strong>
+            <small id="kpi-loss-sub" class="kpi-sub">Apparent S = 155.7 kVA</small>
           </div>
         </div>
-      </aside>
+      </header>
 
-      <!-- BAY 02: DUAL CRT PHASOR OSCILLOSCOPE & VECTOR POWER TRIANGLE -->
-      <section class="bay-panel">
-        <div class="bay-head">
-          <span>[BAY-02] SYNCHROSCOPE &amp; VECTOR POWER TRIANGLE ANALYZER</span>
-          <span>50.00 Hz LOCKED</span>
+      <!-- Middle Single-Line Diagram Card -->
+      <section class="card">
+        <div class="card-header">
+          <span class="card-title">Single-Line Distribution Topology (400V Busbar)</span>
+          <span class="card-meta">Real-Time Active &amp; Reactive Power Flow</span>
         </div>
-        <div class="scopes-stack">
-          <div class="scope-frame">
-            <div class="scope-caption">
-              <span>CH1: v(t) PHASE VOLTAGE vs CH2: i(t) LINE CURRENT DISPLACEMENT</span>
-              <span>TIMEBASE: 5ms/div</span>
-            </div>
-            <div class="canvas-box">
-              <canvas id="wave-canvas"></canvas>
-            </div>
-          </div>
-
-          <div class="scope-frame">
-            <div class="scope-caption">
-              <span>COMPLEX POWER VECTOR PLANE: P (kW) + jQ (kVAR) = S (kVA)</span>
-              <span>RED DASH = UNCOMPENSATED</span>
-            </div>
-            <div class="canvas-box">
-              <canvas id="triangle-canvas"></canvas>
-            </div>
-          </div>
+        <div class="sld-wrap">
+          <svg id="sld-svg"></svg>
         </div>
       </section>
 
-      <!-- BAY 03: APFC CAPACITOR CONTACTORS, SOLAR PV TIE-IN & BREAKER CUBICLES -->
-      <aside class="bay-panel">
-        <div class="bay-head">
-          <span>[BAY-03] APFC CONTACTOR MATRIX &amp; PLANT BREAKERS</span>
-          <span>6 × 30 kVAR</span>
-        </div>
-        <div class="switchgear-controls">
-
-          <div class="control-block">
-            <div class="block-label">
-              <span>AUTOMATIC POWER FACTOR CONTROLLER (REGULATOR)</span>
-              <span>180 kVAR MAX</span>
-            </div>
-            <button id="btn-auto-apfc" class="sw-btn sw-auto-full">
-              🤖 ENABLE AUTO-APFC CLOSED-LOOP RELAY
-            </button>
-            <div id="cap-grid" class="cap-grid"></div>
+      <!-- Bottom Split Charts: Phase Oscilloscope + Power Triangle -->
+      <div class="charts-split">
+        <section class="card">
+          <div class="card-header">
+            <span class="card-title">Phase Voltage v(t) &amp; Current i(t) Waveform</span>
+            <span class="card-meta">50 Hz Sinusoidal Displacement</span>
           </div>
-
-          <div class="control-block">
-            <div class="block-label">
-              <span>ROOFTOP SOLAR PV INVERTER TIE-IN (UNITY PF)</span>
-              <span id="solar-val-txt" class="amber-txt">35% (35 kW)</span>
-            </div>
-            <input id="solar-slider" type="range" min="0" max="100" value="35" class="blueprint-slider" />
-            <div class="slider-ticks">
-              <span>0% NIGHT</span>
-              <span>50% OVERCAST</span>
-              <span>100% PEAK (100kW)</span>
-            </div>
+          <div class="canvas-box">
+            <canvas id="wave-canvas"></canvas>
           </div>
+        </section>
 
-          <div class="control-block" style="border-bottom:none; padding-bottom:0;">
-            <div class="block-label">
-              <span>MCC INDUSTRIAL FEEDER CIRCUIT BREAKERS (52-1 .. 52-5)</span>
-              <span>CLICK TO TRIP/CLOSE</span>
-            </div>
-            <div id="load-list" class="load-list"></div>
+        <section class="card">
+          <div class="card-header">
+            <span class="card-title">Vector Power Triangle (P, Q, S)</span>
+            <span class="card-meta">Dashed = Uncompensated Vector</span>
           </div>
+          <div class="canvas-box">
+            <canvas id="triangle-canvas"></canvas>
+          </div>
+        </section>
+      </div>
 
-        </div>
-      </aside>
+    </main>
 
-    </div>
+  </div>
 
-  </main>
-
-  <script src="js/engine/microgrid.js?v=20261101_02"></script>
-  <script src="js/app.js?v=20261101_02"></script>
+  <script src="js/engine/microgrid.js?v=20261101_03"></script>
+  <script src="js/app.js?v=20261101_03"></script>
 </body>
 </html>
