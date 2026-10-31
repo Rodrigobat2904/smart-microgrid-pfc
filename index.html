@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GridSync — 3-Phase Smart Microgrid & Power Factor (cos φ) Correction Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=20261101_01" />
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <div class="brand-icon">cosφ</div>
+      <div class="brand-title">
+        <h1>
+          GridSync Microgrid &amp; APFC Studio
+          <span class="badge-sys">400V 3-PHASE · 50 Hz EMS</span>
+        </h1>
+        <p>Interactive Reactive Power Compensation, Capacitor Bank Switching, Phase-Angle Oscilloscope &amp; Power Triangle</p>
+      </div>
+    </div>
+
+    <div class="scenario-bar">
+      <button id="btn-scen-lag" class="btn btn-rose">⚠️ Heavy Lagging Penalty (cos φ = 0.65)</button>
+      <button id="btn-scen-opt" class="btn btn-emerald">✨ Optimal APFC Solution (cos φ = 0.99)</button>
+      <button id="btn-scen-lead" class="btn">⚡ Over-Compensated Leading Hazard</button>
+    </div>
+  </header>
+
+  <main class="main-grid">
+
+    <!-- LEFT COLUMN: KPI Telemetry, Waveforms, Power Triangle, Single-Line Diagram -->
+    <div class="col-stack">
+
+      <div id="verdict-banner" class="verdict-banner penalty">
+        <span>⚡ GRID DIAGNOSTIC: PENALTY ALERT (LOW LAGGING PF)</span>
+        <span>Bus Voltage: 382.4 V_LL (50 Hz)</span>
+      </div>
+
+      <!-- 5 KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Power Factor (cos φ)</div>
+          <div id="kpi-pf" class="kpi-val">0.692</div>
+          <div id="kpi-pf-sub" class="kpi-sub">Angle φ = 46.2°</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">RMS Line Current (I_L)</div>
+          <div id="kpi-current" class="kpi-val">312.5 A</div>
+          <div id="kpi-current-sub" class="kpi-sub">3-Phase Feeder</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Active Power (P)</div>
+          <div id="kpi-power" class="kpi-val">150.0 kW</div>
+          <div id="kpi-power-sub" class="kpi-sub">Grid + Solar PV</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Net Reactive (Q_net)</div>
+          <div id="kpi-reactive" class="kpi-val">156.4 kVAR</div>
+          <div id="kpi-reactive-sub" class="kpi-sub">Load - Cap Bank</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Feeder I²R Loss</div>
+          <div id="kpi-loss" class="kpi-val">13.18 kW</div>
+          <div id="kpi-loss-sub" class="kpi-sub">Apparent S = 216.7 kVA</div>
+        </div>
+      </div>
+
+      <!-- Dual Visualizers: Oscilloscope + Power Triangle -->
+      <div class="viz-row">
+        <section class="panel">
+          <div class="panel-header">
+            <span class="panel-title">📈 Voltage v(t) vs Current i(t) Phase-Angle Oscilloscope</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">50 Hz Real-Time Phasor</span>
+          </div>
+          <div class="panel-body">
+            <div class="canvas-box">
+              <canvas id="wave-canvas"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <span class="panel-title">📐 Vector Power Triangle (P, Q, S)</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Dashed = Uncompensated</span>
+          </div>
+          <div class="panel-body">
+            <div class="canvas-box">
+              <canvas id="triangle-canvas"></canvas>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Single Line Diagram (SLD) -->
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">🔌 3-Phase Substation Single-Line Diagram (SLD)</span>
+          <span style="font-size: 0.72rem; color: var(--text-muted);">IEEE / IEC Busbar Topology</span>
+        </div>
+        <div class="panel-body" style="padding: 10px 16px;">
+          <svg id="sld-svg" style="width: 100%; height: 155px; display: block;"></svg>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT COLUMN: APFC Capacitor Bank Controller, Solar PV & Industrial Load Breakers -->
+    <aside class="col-stack">
+
+      <!-- 6-Stage Detuned Capacitor Bank -->
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">🔋 6-Stage Detuned Capacitor Bank (APFC)</span>
+          <span style="font-size: 0.72rem; color: #e9d5ff;">6 × 25 kVAR</span>
+        </div>
+        <div class="panel-body">
+          <button id="btn-auto-apfc" class="btn" style="width: 100%; margin-bottom: 10px; justify-content: center;">
+            🤖 Enable Auto-APFC Closed-Loop Relay
+          </button>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 6px;">
+            Click capacitor stages below to inject capacitive reactive power ($-Q_C$) and align current phase with voltage:
+          </p>
+          <div id="cap-grid" class="cap-grid"></div>
+        </div>
+      </section>
+
+      <!-- Solar PV Grid-Tied Inverter -->
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">☀️ Rooftop Solar PV Inverter (100 kWp)</span>
+          <span id="solar-val-txt" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--amber-solar);">35% (35 kW)</span>
+        </div>
+        <div class="panel-body">
+          <input id="solar-slider" type="range" min="0" max="100" value="35" style="width: 100%; accent-color: #f59e0b; cursor: pointer;" />
+          <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">
+            <span>0% (Night)</span>
+            <span>50% (Cloudy)</span>
+            <span>100% (Peak 100 kW)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Industrial Plant Load Breakers -->
+      <section class="panel">
+        <div class="panel-header">
+          <span class="panel-title">🏭 Industrial Plant Load Breakers</span>
+          <span style="font-size: 0.7rem; color: var(--text-muted);">Click to Toggle</span>
+        </div>
+        <div class="panel-body">
+          <div id="load-list" class="load-list"></div>
+        </div>
+      </section>
+
+    </aside>
+
+  </main>
+
+  <script src="js/engine/microgrid.js?v=20261101_01"></script>
+  <script src="js/app.js?v=20261101_01"></script>
+</body>
+</html>
