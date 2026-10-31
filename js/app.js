@@ -5,6 +5,7 @@
 class GridSyncApp {
   constructor() {
     this.engine = new MicrogridEngine();
+    this.engine.setCapStages(4);
     this.phaseTick = 0;
 
     this.initDOM();
@@ -145,10 +146,10 @@ class GridSyncApp {
 
     this.solarValTxt.textContent = `${this.engine.solarIrradiancePct}% (${t.solarKw} kW)`;
 
-    this.btnAutoApfc.className = `btn ${this.engine.autoApfcEnabled ? 'btn-emerald' : ''}`;
+    this.btnAutoApfc.className = `sw-btn sw-auto-full ${this.engine.autoApfcEnabled ? 'btn-emerald' : ''}`;
     this.btnAutoApfc.textContent = this.engine.autoApfcEnabled
-      ? '🤖 Auto-APFC Relay: ACTIVE (Target cos φ ≥ 0.98)'
-      : '🤖 Enable Auto-APFC Closed-Loop Relay';
+      ? '🤖 AUTO-APFC RELAY: ENGAGED (TARGET cos φ ≥ 0.98)'
+      : '🤖 ENABLE AUTO-APFC CLOSED-LOOP RELAY';
 
     this.renderLoadBreakers();
     this.renderCapButtons();
@@ -157,41 +158,41 @@ class GridSyncApp {
 
   renderSingleLineDiagram() {
     const t = this.engine.telemetry;
-    const capCol = t.capKvar > 0 ? '#a855f7' : '#475569';
-    const pvCol = t.solarKw > 0 ? '#f59e0b' : '#475569';
+    const capCol = t.capKvar > 0 ? '#00f5d4' : '#475569';
+    const pvCol = t.solarKw > 0 ? '#ffb703' : '#475569';
     const loadCol = t.loadKw > 0 ? '#38bdf8' : '#475569';
 
-    this.sldSvg.setAttribute('viewBox', '0 0 820 155');
+    this.sldSvg.setAttribute('viewBox', '0 0 1120 132');
     this.sldSvg.innerHTML = `
       <!-- Main 400V 3-Phase Industrial Busbar -->
-      <line x1="60" y1="76" x2="760" y2="76" stroke="#38bdf8" stroke-width="5" stroke-linecap="round" />
-      <text x="410" y="66" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700">
-        400V AC 3-PHASE MAIN DISTRIBUTION BUSBAR (${t.busVoltageLL} V_LL | I_bus = ${t.lineCurrentAmp} A)
+      <line x1="60" y1="66" x2="1060" y2="66" stroke="#ffb703" stroke-width="5" stroke-linecap="square" />
+      <text x="560" y="56" text-anchor="middle" fill="#ffb703" font-family="Share Tech Mono, monospace" font-size="11" font-weight="700">
+        ═══ 400V AC 3-PHASE MAIN SUBSTATION BUSBAR (V_LL = ${t.busVoltageLL} V | I_FEEDER = ${t.lineCurrentAmp} A | cos φ = ${t.powerFactor.toFixed(3)}) ═══
       </text>
 
-      <!-- Utility Grid Feeder (Left) -->
-      <rect x="45" y="12" width="145" height="40" rx="6" fill="#131c31" stroke="#10b981" stroke-width="1.6" />
-      <text x="117" y="29" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">UTILITY GRID (PLN 20kV/400V)</text>
-      <text x="117" y="43" text-anchor="middle" fill="#cbd5e1" font-family="JetBrains Mono, monospace" font-size="8.5">Import: ${t.gridImportKw} kW | ${t.QNetKvar} kVAR</text>
-      <line x1="117" y1="52" x2="117" y2="76" stroke="#10b981" stroke-width="2.5" />
+      <!-- Utility Grid Feeder (Top Left) -->
+      <rect x="65" y="6" width="225" height="38" rx="0" fill="#06152d" stroke="#00f5d4" stroke-width="1.8" />
+      <text x="177" y="21" text-anchor="middle" fill="#00f5d4" font-family="Share Tech Mono, monospace" font-size="10" font-weight="700">[CB-01] UTILITY PCC (20kV/400V)</text>
+      <text x="177" y="36" text-anchor="middle" fill="#e2f1ff" font-family="Share Tech Mono, monospace" font-size="9.5">IMPORT: ${t.gridImportKw} kW | Q_NET: ${t.QNetKvar} kVAR</text>
+      <line x1="177" y1="44" x2="177" y2="66" stroke="#00f5d4" stroke-width="2.5" />
 
       <!-- Solar PV Inverter (Top Right) -->
-      <rect x="615" y="12" width="150" height="40" rx="6" fill="#131c31" stroke="${pvCol}" stroke-width="1.6" />
-      <text x="690" y="29" text-anchor="middle" fill="${pvCol}" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">SOLAR PV INVERTER</text>
-      <text x="690" y="43" text-anchor="middle" fill="#cbd5e1" font-family="JetBrains Mono, monospace" font-size="8.5">Output: ${t.solarKw} kW (Unity PF)</text>
-      <line x1="690" y1="52" x2="690" y2="76" stroke="${pvCol}" stroke-width="2.5" />
+      <rect x="820" y="6" width="225" height="38" rx="0" fill="#06152d" stroke="${pvCol}" stroke-width="1.8" />
+      <text x="932" y="21" text-anchor="middle" fill="${pvCol}" font-family="Share Tech Mono, monospace" font-size="10" font-weight="700">[INV-PV] SOLAR TIE-IN (100kWp)</text>
+      <text x="932" y="36" text-anchor="middle" fill="#e2f1ff" font-family="Share Tech Mono, monospace" font-size="9.5">INJECTION: ${t.solarKw} kW (UNITY PF)</text>
+      <line x1="932" y1="44" x2="932" y2="66" stroke="${pvCol}" stroke-width="2.5" />
 
       <!-- Industrial Inductive Motor Loads (Bottom Left) -->
-      <line x1="230" y1="76" x2="230" y2="102" stroke="${loadCol}" stroke-width="2.5" />
-      <rect x="135" y="102" width="190" height="42" rx="6" fill="#131c31" stroke="${loadCol}" stroke-width="1.6" />
-      <text x="230" y="119" text-anchor="middle" fill="${loadCol}" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">INDUCTIVE PLANT LOADS</text>
-      <text x="230" y="134" text-anchor="middle" fill="#cbd5e1" font-family="JetBrains Mono, monospace" font-size="8.5">P = ${t.loadKw} kW | Q_L = ${t.loadKvar} kVAR</text>
+      <line x1="330" y1="66" x2="330" y2="88" stroke="${loadCol}" stroke-width="2.5" />
+      <rect x="200" y="88" width="260" height="38" rx="0" fill="#06152d" stroke="${loadCol}" stroke-width="1.8" />
+      <text x="330" y="103" text-anchor="middle" fill="${loadCol}" font-family="Share Tech Mono, monospace" font-size="10" font-weight="700">[MCC-1..5] INDUCTIVE PLANT FEEDERS</text>
+      <text x="330" y="118" text-anchor="middle" fill="#e2f1ff" font-family="Share Tech Mono, monospace" font-size="9.5">P_LOAD = ${t.loadKw} kW | Q_L = +${t.loadKvar} kVAR</text>
 
       <!-- 6-Stage Detuned Capacitor Bank (Bottom Right) -->
-      <line x1="560" y1="76" x2="560" y2="102" stroke="${capCol}" stroke-width="2.5" />
-      <rect x="460" y="102" width="200" height="42" rx="6" fill="#131c31" stroke="${capCol}" stroke-width="1.6" />
-      <text x="560" y="119" text-anchor="middle" fill="${capCol}" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">APFC CAPACITOR BANK (${this.engine.activeCapStages}/6)</text>
-      <text x="560" y="134" text-anchor="middle" fill="#cbd5e1" font-family="JetBrains Mono, monospace" font-size="8.5">Injection: Q_C = -${t.capKvar} kVAR</text>
+      <line x1="770" y1="66" x2="770" y2="88" stroke="${capCol}" stroke-width="2.5" />
+      <rect x="640" y="88" width="260" height="38" rx="0" fill="#06152d" stroke="${capCol}" stroke-width="1.8" />
+      <text x="770" y="103" text-anchor="middle" fill="${capCol}" font-family="Share Tech Mono, monospace" font-size="10" font-weight="700">[APFC C1..C6] DETUNED CAP BANK (${this.engine.activeCapStages}/6)</text>
+      <text x="770" y="118" text-anchor="middle" fill="#e2f1ff" font-family="Share Tech Mono, monospace" font-size="9.5">COMPENSATION: Q_C = -${t.capKvar} kVAR</text>
     `;
   }
 
