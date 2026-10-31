@@ -28,8 +28,8 @@ class MicrogridEngine {
     this.solarIrradiancePct = 35; // % of 100 kW peak array
     this.solarPeakKw = 100;
 
-    // 6-Stage Detuned Capacitor Bank (6 x 25 kVAR = 150 kVAR max)
-    this.capStageKvar = 25;
+    // 6-Stage Detuned Capacitor Bank (6 x 30 kVAR = 180 kVAR max)
+    this.capStageKvar = 30;
     this.maxCapStages = 6;
     this.activeCapStages = 0; // Initially 0 stages (uncompensated lagging PF!)
 

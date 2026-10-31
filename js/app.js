@@ -99,7 +99,7 @@ class GridSyncApp {
       const isOn = i <= this.engine.activeCapStages;
       const btn = document.createElement('button');
       btn.className = `cap-step-btn ${isOn ? 'active' : ''}`;
-      btn.innerHTML = `STAGE C${i}<br/><span style="font-size:0.68rem;opacity:0.8">+25 kVAR</span>`;
+      btn.innerHTML = `STAGE C${i}<br/><span style="font-size:0.68rem;opacity:0.8">+30 kVAR</span>`;
       btn.addEventListener('click', () => {
         this.engine.autoApfcEnabled = false;
         const target = (this.engine.activeCapStages === i) ? i - 1 : i;
